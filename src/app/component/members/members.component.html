@@ -1,0 +1,281 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                        <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger mr-2"
+                            (click)="deleteSelectedMembers()"
+                            [disabled]="!selectedMembers || !selectedMembers.length"></button>
+                        <span class="p-buttonset">
+                            <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()"
+                                class="p-button-warning" pTooltip="XLS" tooltipPosition="bottom"></button>
+                            <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="exportPdf()"
+                                class="p-button-warning" pTooltip="PDF" tooltipPosition="bottom"></button>
+                        </span>
+                    </div>
+                </ng-template>
+            </p-toolbar>-
+
+            <p-table id="my-table" #dt [value]="members" responsiveLayout="scroll" [rows]="10"
+                [globalFilterFields]="['name','mobile','dob','email']" [rows]="10" [paginator]="true"
+                [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedMembers" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Members</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="mobile">Mobile<p-sortIcon field="mobile"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="dob">DOB<p-sortIcon field="dob"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="email">E-Mail<p-sortIcon field="email"></p-sortIcon>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-member>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="member"></p-tableCheckbox>
+                        </td>
+                        <td>{{member.name}}</td>
+                        <td>{{member.mobile}}</td>
+                        <td>{{member.dob}}</td>
+                        <td>{{member.email}}</td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-eye"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="viewMember(member)"></button>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editMember(member)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                                    (click)="deleteMember(member)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="memberDialog" [style]="{width: '450px'}" header="Member Details" [modal]="true"
+            class="p-fluid">
+            <ng-template pTemplate="content">
+                
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="member.name" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.name}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.name">Name is required.</small>
+                </div>
+               
+                <div class="field">
+                    <label for="mobile">Mobile</label>
+                    <p-inputMask mask="9999999999" placeholder="9999999999" id="mobile" [(ngModel)]="member.mobile"
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.mobile}"></p-inputMask>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.mobile">Mobile No is
+                        required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="dob"> DOB</label>
+                    <input type="date" pInputText id="dob" [(ngModel)]="member.dob" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.dob}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.dob">DOB is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="subscription">Subscription</label>
+                    <p-dropdown [(ngModel)]="member.subscription" inputId="class" optionValue="value" [options]="subscriptions"
+                        placeholder="Choose Subscription">
+                        <ng-template pTemplate="selectedItem">
+                            {{member.subscription}}
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+                
+                 <div class="field">
+                    <label for="trainername">Trainer Name</label>
+                    <select pInputText [(ngModel)]="member.trainername" placeholder="Choose Trainer Name"  required>
+                        <option *ngFor="let trainer of trainers" [value]="trainer.name">{{trainer.name}}</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="email">E-Mail</label>
+                    <input type="email" pInputText id="email" [(ngModel)]="member.email" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.email}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.email">E-Mail is required.</small>
+                </div>
+
+                <!-- <div class="field-radiobutton">
+                    <label for="gender"> Gender</label>
+                    <p-radioButton type="gender" value="Male" [(ngModel)]="valRadio" pInputText id="gender"></p-radioButton>
+						<label for="gender"> Male</label> -->
+                        
+                    <div class="field-radiobutton">
+                    <label for="gender">Gender</label>
+                        <p-radioButton name="gender" value="Male" [(ngModel)]="member.gender" id="male"></p-radioButton>
+                        <label for="city1">Male</label>
+                        </div>
+                            
+                                <div class="field-radiobutton">
+                                    <p-radioButton name="gender" value="Female" [(ngModel)]="member.gender"
+                                                   id="female"></p-radioButton>
+                                    <label for="city2">Female</label>
+                                </div>
+
+                        
+                <div class="field">
+                    <label for="emergencyno">Emergency No</label>
+                    <p-inputMask mask="9999999999" placeholder="9999999999" id="emergencyno" [(ngModel)]="member.emergencyno"
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.emergencyno}"></p-inputMask>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.emergencyno">Emergency No is
+                        required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="relationship">Relationship </label>
+                    <input type="text" pInputText id="relationship" [(ngModel)]="member.relationship" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.relationship}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.relationship">Field is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="height">Height</label>
+                    <input type="text" pInputText id="height" [(ngModel)]="member.height" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.height}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.height">Height is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="cweight">Current Weight</label>
+                    <input type="text" pInputText id="cweight" [(ngModel)]="member.cweight" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.cweight}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.cweight">Current Weight is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="gweight">Goal Weight</label>
+                    <input type="text" pInputText id="g_weight" [(ngModel)]="member.gweight" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !member.gweight}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !member.gweight">Goal Weight is required.</small>
+                </div>
+
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+                    (click)="saveMember()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="memberViewDialog" [style]="{width: '450px'}" header="Member Details" [modal]="true"
+            class="p-fluid">
+            <ng-template pTemplate="content">
+                
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="member.name" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="mobile">Mobile</label>
+                    <input type="text" pInputText id="mobile" [(ngModel)]="member.mobile" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="dob">DOB</label>
+                    <input type="text" pInputText id="dob" [(ngModel)]="member.dob" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="subscription">Subscription</label>
+                    <input type="text" pInputText id="subscription" [(ngModel)]="member.subscription" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="trainername">Trainer Name</label>
+                    <input type="text" pInputText id="trainername" [(ngModel)]="member.trainername" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="text" pInputText id="email" [(ngModel)]="member.email" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="gender">Gender</label>
+                    <input type="text" pInputText id="gender" [(ngModel)]="member.gender" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="emergencyno">Emergency No</label>
+                    <input type="text" pInputText id="emergencyno" [(ngModel)]="member.emergencyno" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="relationship">Relationship</label>
+                    <input type="text" pInputText id="relationship" [(ngModel)]="member.relationship" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="height">Height</label>
+                    <input type="text" pInputText id="height" [(ngModel)]="member.height" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="cweight">Current Weight</label>
+                    <input type="text" pInputText id="cweight" [(ngModel)]="member.cweight" readonly required autofocus/>
+                </div>
+                <div class="field">
+                    <label for="gweight">Goal Weight</label>
+                    <input type="text" pInputText id="gweight" [(ngModel)]="member.gweight" readonly required autofocus/>
+                </div>
+                
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteMemberDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="member">Are you sure you want to delete <b>{{member.name}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteMemberDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteMembersDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span>Are you sure you want to delete selected tainers?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteMembersDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        
+                        
+                        <span class="p-buttonset">
+                            <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()"
+                                class="p-button-warning" pTooltip="XLS" tooltipPosition="bottom"></button>
+                                &nbsp;
+                            <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="exportPdf()"
+                                class="p-button-warning" pTooltip="PDF" tooltipPosition="bottom"></button>
+                        </span>
+                    </div>
+                </ng-template>
+            </p-toolbar>-
+
+            <p-table id="my-table" #dt [value]="subreports" responsiveLayout="scroll"  
+                [globalFilterFields]="['name','mobile','plan','date']" [rows]="10" [paginator]="true"
+                [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                 [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Subreports</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="mobile">Mobile<p-sortIcon field="mobile"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="plan">Plan<p-sortIcon field="plan"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="date">date
+								<p-columnFilter type="date" field="date" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </th>
+                        <th pSortableColumn="dob">Expiry Date<p-sortIcon field="dob"></p-sortIcon>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-subreport>
+                    <tr>
+                        
+                        <td>{{subreport.member.name}}</td>
+                        <td>{{subreport.member.mobile}}</td>
+                        <td>{{subreport.plan}} Month</td>
+                        <td>{{subreport.createdAt | date:"dd/MM/yyyy"}}</td>
+                        <td>{{subreport.createdAt | date:"dd/MM/yyyy"}}</td>
+                        <!-- <td>{{expiryDate(subreport.createdAt)}}</td> -->
+                        
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+       
+    </div>
+</div>

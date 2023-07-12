@@ -1,0 +1,98 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <span class="p-buttonset">
+                            <!-- <button type="button" pButton pRipple icon="pi pi-file-edit" (click)="exportExcel()"
+                            class="p-button-warning" pTooltip="XLS" tooltipPosition="bottom"></button> -->
+                            <a routerLink="/subreports" pButton pRipple icon="pi pi-file-edit" routerLinkActive="members"> &nbsp;Reports</a>
+                            <!-- <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()"
+                                class="p-button-warning" pTooltip="XLS" tooltipPosition="bottom"></button>
+                            <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="exportPdf()"
+                                class="p-button-warning" pTooltip="PDF" tooltipPosition="bottom"></button> -->
+                        </span>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+            <p-table id="my-table" #dt [value]="members" responsiveLayout="scroll" [rows]="10"
+                [globalFilterFields]="['name','mobile','email']" [rows]="10" [paginator]="true"
+                [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                 [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Subscriptions Details</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        
+                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="mobile">Mobile<p-sortIcon field="mobile"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="dob">DOB<p-sortIcon field="dob"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="subscription">Plan<p-sortIcon field="subscription"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="email">E-Mail<p-sortIcon field="email"></p-sortIcon>
+                        </th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-member>
+                    <tr>
+                       
+                        <td>{{member.name}}</td>
+                        <td>{{member.mobile}}</td>
+                        <td>{{member.dob}}</td>
+                        <td>{{member.subscription}}</td>
+                        <td>{{member.email}}</td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-bell" class="p-button-rounded p-button-warning"
+                                pTooltip="Enter your username" (click)="subscribeMember(member)"></button>
+
+                                    <!-- <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2"
+                                    (click)="viewMember(member)"></button> -->
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            
+        </div>
+        
+
+        <p-dialog [(visible)]="subscribeDialogBox" [style]="{width: '450px',height: '400px'}" header="Subscription Details" [modal]="true"
+            class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="subscription">Plan Type</label>
+                    <p-dropdown [(ngModel)]="subscription.plan" inputId="plan" optionValue="value" [options]="plans"
+                        placeholder="Choose Subscription">
+                        <ng-template pTemplate="selectedItem">
+                            {{subscription.plan}}
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+                <button pButton pRipple label="Subscribe" icon="pi pi-check" class="p-button-text"
+                    (click)="subscribeMembership()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

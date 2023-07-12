@@ -1,0 +1,201 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                        <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger mr-2"
+                            (click)="deleteSelectedTrainers()"
+                            [disabled]="!selectedTrainers || !selectedTrainers.length"></button>
+                        <span class="p-buttonset">
+                            <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()"
+                                class="p-button-warning" pTooltip="XLS" tooltipPosition="bottom"></button>
+                            <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="exportPdf()"
+                                class="p-button-warning" pTooltip="PDF" tooltipPosition="bottom"></button>
+                        </span>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table id="my-table" #dt [value]="trainers" responsiveLayout="scroll" [rows]="10"
+                [globalFilterFields]="['name','mobile','email']" [rows]="10" [paginator]="true"
+                [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedTrainers" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Trainers</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="mobile">Mobile<p-sortIcon field="mobile"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="dob">DOB<p-sortIcon field="dob"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="email">E-Mail<p-sortIcon field="email"></p-sortIcon>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-trainer>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="trainer"></p-tableCheckbox>
+                        </td>
+                        <td>{{trainer.name}}</td>
+                        <td>{{trainer.mobile}}</td>
+                        <td>{{trainer.dob}}</td>
+                        <td>{{trainer.email}}</td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-eye"
+                                class="p-button-rounded p-button-success mr-2"
+                                (click)="viewTrainer(trainer)"></button>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editTrainer(trainer)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                                    (click)="deleteTrainer(trainer)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="trainerDialog" [style]="{width: '450px'}" header="Trainer Details" [modal]="true"
+            class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="trainer.name" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.name}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.name">Name is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="mobile">Mobile</label>
+                    <p-inputMask mask="9999999999" placeholder="9999999999" id="mobile" [(ngModel)]="trainer.mobile"
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.mobile}"></p-inputMask>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.mobile">Mobile No is
+                        required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="dob"> DOB</label>
+                    <input type="date" pInputText id="dob" [(ngModel)]="trainer.dob" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.dob}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.dob">DOB is required.</small>
+                </div>
+            
+                <div class="field">
+                    <label for="email">E-Mail</label>
+                    <input type="email" pInputText id="email" [(ngModel)]="trainer.email" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.email}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.email">E-Mail is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="gender">Gender</label>
+                    <input type="text" pInputText id="email" [(ngModel)]="trainer.gender" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.gender}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.gender">Gender is required.</small>
+                </div>
+
+                <div class="field">
+                    <label for="address">Address</label>
+                    <input type="text" pInputText id="address" [(ngModel)]="trainer.address" required autofocus
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !trainer.address}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !trainer.address">Address is required.</small>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+                    (click)="saveTrainer()"></button>
+            </ng-template>
+        </p-dialog>
+
+
+
+        <p-dialog [(visible)]="trainerViewDialog" [style]="{width: '450px'}" header="Trainer Details" [modal]="true"
+            class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="trainer.name" readonly required autofocus />
+                </div>
+                <div class="field">
+                    <label for="mobile">Mobile</label>
+                    <input type="text" pInputText id="mobile" [(ngModel)]="trainer.mobile" readonly required autofocus />
+                </div>
+                <div class="field">
+                    <label for="dob">DOB</label>
+                    <input type="text" pInputText id="dob" [(ngModel)]="trainer.dob" readonly required autofocus />
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="text" pInputText id="email" [(ngModel)]="trainer.email" readonly required autofocus />
+                </div>
+                
+                <div class="field">
+                    <label for="gender">Gender</label>
+                    <input type="text" pInputText id="gender" [(ngModel)]="trainer.gender" readonly required autofocus />
+                </div>
+                <div class="field">
+                    <label for="address">Gender</label>
+                    <input type="text" pInputText id="address" [(ngModel)]="trainer.address" readonly required autofocus />
+                </div>
+                
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteTrainerDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="trainer">Are you sure you want to delete <b>{{trainer.name}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteTrainerDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteTrainersDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span>Are you sure you want to delete selected tainers?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteTrainersDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>
